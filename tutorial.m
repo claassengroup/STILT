@@ -5,7 +5,6 @@
 % STILT.  For details on the method please see
 % TODO: citation
 
-init
 %% Installation
 % The STILT toolbox is a set of Matlab scripts/functions and is 'installed'
 % by copying and adding the directory to Matlab's search path. Furthermore,
@@ -23,6 +22,8 @@ init
 % be deleted.
 %
 
+init
+
 %% SBML model
 %
 % STILT reads SBML files via
@@ -36,9 +37,9 @@ init
 % For example, for the reaction *X + Y --> X + Z*
 % the species *X* is both educt and product.
 % The definition of reaction rates is imported from _kineticlaw.formula_ field
-% of the reaction definition with in the SBML file. Use Latex syntax in the names of
+% of the reaction definition with in the SBML file. Latex syntax can be used for the names of
 % species and parameters for plotting.  See examples/Nanog/NoFeedback.xml
-% and examples/Nanog/NegativeFeedback.xml for example SBML model configuration.
+% and examples/Nanog/NegFeedback.xml for example SBML model configuration.
 
 %% Data
 % 
@@ -92,7 +93,11 @@ sbmlModelNoFeedback = TranslateSBML(fullfile(exampleDir, 'NoFeedback.xml'));
 % The function _stlOptions_ creates a structure with all options available
 % in STILT set to their default values.  It requires the following three arguments
 % in the specified order: i) the _sbmlModel_, ii) the _data_ structure, and iii) the number of 
-% particles to use for inference.
+% particles to use for inference.  It is also possible to leave _data_
+% empty using [], e.g. if using simulated data.  In this case the species
+% names and indices of observed species need to be specified manually (see
+% examples below). Otherwise previously stored data can be loaded using the
+% _stlLoadData_ function.
 
 % Create options template from model, data and particle number
 optsNoFeedback = stlOptions(sbmlModelNoFeedback, [], 7e5);
@@ -105,7 +110,7 @@ optsNoFeedback.OutDir = fullfile(exampleDir, 'NoFeedbackNull_Results');
 %
 % The function _stlSetOptSpecies_(_opt_, _ParameterName_, _FieldName_, _FieldValue_) can be
 % used to configure the behavior of individual species in the options
-% structure. Options are specified as name/value (_FieldName_,_FieldValue_) pairs.
+% structure. Options are specified as name/value (_FieldName_, _FieldValue_) pairs.
 % The field 'Init' contains a Matlab command (as string), which
 % is evaluated at runtime for particle initialzation. The number of particles
 % specified at run time can be accessed with the variable _P_. 
@@ -117,39 +122,46 @@ optsNoFeedback.OutDir = fullfile(exampleDir, 'NoFeedbackNull_Results');
 optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'DNA_on', 'Init', 'binornd(1, 0.5, [P,1])');
 optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'DNA_off', 'Init', '1-DNA_on');
 optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'RNA', 'Init', 'randi(50,P,1)');
-optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'Protein', 'Init', 'max(0,round(normrnd(Protein1, ProteinSigma1, [P, 1])))');
+optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'Protein', 'Init', ... 
+    'max(0,round(normrnd(Protein1, ProteinSigma1, [P, 1])))');
 
 %%
 % <html>
 % <h3>Configure cell division</h3>
 % </html>
 %
-% STILT currently supports two modes of cell division possible for each simulated species.
+% STILT currently supports three modes of cell division possible for each simulated species.
 % They may be configured for each species individually via the field 'Division' in the STILT options structure: 
 %
 % * 'copy' ... (default) the mother's content is copied to both daughter cells (e.g. for DNA)
 % * 'binomial' ... the mother's content M is split binomially between the 
 % daughters. B(M, 0.5) (if M > 100 approximated with a normal distribution.)
-% * 'binomial' with the oarameter _p_ specified using the additional
+% * 'binomial' with the parameter _p_ specified using the additional
 % name/value pair _DivisionParameters_.
 optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'RNA', 'Division', 'binomial');
 % opts_NoFeedback = stlSetOptSpecies(opts_NoFeedback, 'Protein', 'Division', 'binomial'); % default p = 0.5
-optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'Protein', 'Division', 'binomial', 'DivisionParameters', 'p=0.5'); % specify p explicitly
+optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'Protein', 'Division', 'binomial', ...
+    'DivisionParameters', 'p=0.5'); % specify p explicitly
 
 %%
 % <html>
-% <h3>Prepare forward simulation</h3>
+% <h3>Prepare forward simulation functions</h3>
 % </html>
 %
 % STILT's particle filter is based on stochastic simulation (performed by
 % the function _stlTauLeaping_). The function _stlCreateSimulationFunction_ generates code for performing 
 % stochastic simulation using the information contained in _sbmlModel_ (i.e. the stoichiometry and reaction propensity).
-% The field_opts.fSimulate_ contains a function handle to these simulation files.
+% The field _opts.fSimulate_ contains a function handle to these simulation files.
 
 optsNoFeedback = stlCreateSimulationFunction(sbmlModelNoFeedback, optsNoFeedback, exampleDir, 'NoFeedback');
 
-%% Generate synthetic data using the No Feedback model
-% initial conditions (DNA on, DNA off, mRNA, protein)
+%% Generating synthetic data
+% With STILT it is easy to generate synthetic trees of arbitrary size for a
+% specified model.  Use the funciton _stlSimulateDataSet_ to generate a
+% data structure that is compatible with the inference functions.
+% In the following we generate synthetic data using the No Feedback model.
+
+% initial conditions X0 (DNA on, DNA off, mRNA, protein)
 X0 = [0, 1, 50, 1e4];
 % model parameters (k_on, k_off, k_m, g_m, k_p, g_p)
 theta = [1, 1, 40, 3, 300, 0.4];
@@ -157,8 +169,12 @@ theta = [1, 1, 40, 3, 300, 0.4];
 optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'Protein', 'Observed', true);
 optsNoFeedback = stlSetOptSpecies(optsNoFeedback, 'Protein', 'DataIdx', 1);
 
-timeParams = {12,1,0.5}; % mean, std of cell life times and the dt parameter for observation frequency
-simData_NoFeedback = stlSimulateDataSet(X0, theta, 3, {12,1,0.5}, optsNoFeedback, sbmlModelNoFeedback, 500);
+muCellLife = 12; % mean of cell life time
+stdCellLife = 1; % std of cell life time
+dt = 0.5; % observation frequency
+
+simData_NoFeedback = stlSimulateDataSet(X0, theta, 3, {muCellLife, stdCellLife, dt}, ... 
+    optsNoFeedback, sbmlModelNoFeedback, 500);
 
 %%
 % <html>
@@ -178,16 +194,19 @@ optsNoFeedback = stlSetOptParam(optsNoFeedback, 'g_m', 'GammaPrior', [7, 1.0]); 
 optsNoFeedback = stlSetOptParam(optsNoFeedback, 'k_p', 'GammaPrior', [4.3, 0.005]); % protein birth rate 
 optsNoFeedback = stlSetOptParam(optsNoFeedback, 'g_p', 'GammaPrior', [5, 5]); % protein death rate
 
+%% 
 % Set the field _TrueParamValuesInModel_ in the options for STILT to _true_
 % if the numeric parameter values from SBML are assumed to be correct
 % (i.e. when using synthetic data for which the correct parameters are known)
 % and should be plotted, e.g. in the parameter posterior plot.  
 
+optsNoFeedback.TrueParamValuesInModel = true;
 
-
-
-%% Change the parameters _ShowPlotsWhileFiltering_ and _SavePlotsWhileFiltering_ to
-% generate and save plots, respectively, while running the algorithm.
+%% Configure saving and showing plots 
+% Change the parameters _ShowPlotsWhileFiltering_ and _SavePlotsWhileFiltering_ to
+% generate and save plots, respectively, while running the algorithm. The
+% default behavior is not to show plots while running.  Plots can be shown
+% after the run as completed using hte stlPlot... functions.
 optsNoFeedback.ShowPlotsWhileFiltering = true;
 optsNoFeedback.SavePlotsWhileFiltering = true;
 
@@ -205,16 +224,16 @@ optsNoFeedback.SavePlotsWhileFiltering = true;
 % system state for each cell (timepoints-by-species-by-quantiles)
 % * _obs_ ... _data_ re-structured cell oriented for plotting
 
-
-% configure _LatentQuantilesPerTimestep_ >= 1 to configure the number of
+%%
+% Configure _LatentQuantilesPerTimestep_ >= 1 to configure the number of
 % timesteps to use for interpolating between observations (helps smooth
 % estimated trajectories).
 opts.LatentQuantilesPerTimestep=1;
-% run the particle filter with the No Feedback model
+% run the particle filter with the No Feedback model and save the results
 optsNoFeedback.ParticleNr = 7e5;
 resNoFeedback_Null = stlParticleFilterTree(sbmlModelNoFeedback, simData_NoFeedback, optsNoFeedback);
 
-%% Plot
+%% Plotting the results
 
 %%
 % <html>
@@ -225,40 +244,38 @@ resNoFeedback_Null = stlParticleFilterTree(sbmlModelNoFeedback, simData_NoFeedba
 % its true value (if known, red vertical line), the prior (red dashed line)
 % and the prior mean (blue vertical line).
 
-% resample to smooth the histograms
 stlPlotPosterior(resNoFeedback_Null.c, sbmlModelNoFeedback, optsNoFeedback, []);
 
-%%
-% 
+%% 
 % <<parameter_posterior.png>>
-%
 
 %%
 % <html>
 % <h3>Plot prediction and (if available) measurements for all species</h3>
 % </html>
 %
-% _stlPlotTimecourseSpeciesQuantilesTree_ generates a plot with the time course 
-% of simulation predictions (and measurements) arranged per cell in a tree
-% format for each individual species.
+% The function _stlPlotTimecourseSpeciesQuantilesTree_ generates a plot showing the sampled simulation time courses 
+% and experimental measurements, arranged cell-wise in a tree layout.
 
-% stlPlotTimecourseSpeciesQuantilesTree(sbmlModelNoFeedback, resNoFeedback_Null.obs, opts_NoFeedback, resNoFeedback_Null.Q, []);
+stlPlotTimecourseSpeciesQuantilesTree(sbmlModelNoFeedback, resNoFeedback_Null.obs, optsNoFeedback, resNoFeedback_Null.Q, []);
 
 %%
 % 
-% <<speciesquantiletree.png>>
+% <<Protein.png>>
 %
+%% Negative Feedback model
+% In the following we attempt to fit the data from the No Feedback model
+% using the (incorrect) Negative Feedback model. Later we compute model
+% evidence and Bayes Factors.
 
-%% Fit the data from the no feedback model with the negative feedback model
-% Our working directory. Everything (including results) stored in there.
-% Load SBML via libSBML
+% Load model SBML
 sbmlModelNegativeFeedback = TranslateSBML(fullfile(exampleDir, 'NegFeedback.xml'));
 
 % Create options template from model, data and particle number
 optsNegFeedback = stlOptions(sbmlModelNegativeFeedback, simData_NoFeedback, 7e5);
 % Set output directory for results (figures, data, etc will be in subdirectories)
 optsNegFeedback.OutDir = fullfile(exampleDir, 'NoFeedbackNeg_Results');
-%%
+
 % set parameter prior parameters
 optsNegFeedback = stlSetOptParam(optsNegFeedback, 'k_on', 'GammaPrior', [5, 0.8]); % DNA on rate 
 optsNegFeedback = stlSetOptParam(optsNegFeedback, 'k_off', 'GammaPrior', [7, 1e5]); % DNA off rate 
@@ -276,44 +293,61 @@ optsNegFeedback = stlSetOptSpecies(optsNegFeedback, 'Protein', 'Init', 'max(0,ro
 % create simulation functions
 optsNegFeedback = stlCreateSimulationFunction(sbmlModelNegativeFeedback, optsNegFeedback, exampleDir, 'NegFeedback');
 
-% Change the parameters _ShowPlotsWhileFiltering_ and _SavePlotsWhileFiltering_ to
-% generate and save plots, respectively, while running the algorithm.
+% show plots while running
 optsNegFeedback.ShowPlotsWhileFiltering = 1;
 optsNegFeedback.SavePlotsWhileFiltering = 1;
 
-%% run the particle filter with the Negative Feedback model and the No Feedback data
+% run the particle filter with the Negative Feedback model and the No Feedback data
 optsNegFeedback.ParticleNr = 7e5;
 resNoFeedback_Neg = stlParticleFilterTree(sbmlModelNegativeFeedback, simData_NoFeedback, optsNegFeedback);
 
-%% Generate Data from the Negative Feedback model
+%% Model comparison
+% In the following we first generate data from a different model, the
+% Negative Feedback model.  We then try to fit this data with both the
+% correct model and the incorrect No Feedback model.  We then perform model
+% comparison for to see if the correct model is preferred.
+
+%%
+% Generate Data from the Negative Feedback model
 
 % initial conditions
 X0 = [0, 1, 50, 3e3];
 % model parameters (k_on, k_off, k_m, g_m, k_p, g_p)
 theta = [10, 1e-4, 100, 3, 1000, 0.4];
 
-timeParams = {12,1,0.5}; % mean, std of cell life times and the dt parameter for observation frequency
-simData_NegativeFeedback = stlSimulateDataSet(X0, theta, 3, timeParams, optsNegFeedback, sbmlModelNegativeFeedback, 500);
+muCellLife = 12;
+sigCellLife = 1;
+dt = 0.5; % mean, std of cell life times and the dt parameter for observation frequency
+simData_NegativeFeedback = stlSimulateDataSet(X0, theta, 3, {muCellLife, sigCellLife, dt}, ...
+    optsNegFeedback, sbmlModelNegativeFeedback, 500);
 
-%% run the particle filter with the Negative Feedback model and Neg Feedback data
+% Run the particle filter with the Negative Feedback model and Neg Feedback data
 optsNegFeedback.ParticleNr = 7e5;
 optsNegFeedback.OutDir = fullfile(exampleDir, 'NegFeedbackNeg_Results');
 resNegFeedback_Neg = stlParticleFilterTree(sbmlModelNegativeFeedback, simData_NegativeFeedback, optsNegFeedback);
 
-%% fit the Negative Feedback data with the No Feedback model
+%%
+% We also fit the Negative Feedback data with the incorrect No Feedback model
 
 % Set output directory for results (figures, data, etc will be in subdirectories)
 optsNoFeedback.OutDir = fullfile(exampleDir, 'NegFeedbackNull_Results');
 resNegFeedback_Null = stlParticleFilterTree(sbmlModelNoFeedback, simData_NegativeFeedback, optsNoFeedback);
 
-%% Model comparison with Bayes factors
-% 
-% Perform Bayesian model comparison by computing the Bayes factor between two
-% models directly from the marginal log likelihood of the data given the
-% model P(D_i|M_i) returned in _stlParticleFilterTree's_ results.
+%% 
+% <html>
+% <h3>Bayes factor computation</h3>
+% </html>
+%%
+% Finally we perform model comparison using Bayes factors to select between
+% the two models for each data set.
 
-disp('No feedback model is true:')
+%%
+% No Feedback model is true:
 fprintf('Log P(no feedback) - Log P(neg feedback): %f\n', resNoFeedback_Null.margLogLik - resNoFeedback_Neg.margLogLik)
-
-disp('Negative feedback model is true:')
+%%
+%  Log P(no feedback) - Log P(neg feedback): 112.960154
+%%
+% Negative feedback model is true:
 fprintf('Log P(neg feedback) - Log P(no feedback): %f\n', resNegFeedback_Neg.margLogLik - resNegFeedback_Null.margLogLik)
+%%
+%  Log P(neg feedback) - Log P(no feedback): 32.333551

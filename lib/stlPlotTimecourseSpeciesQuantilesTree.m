@@ -31,7 +31,8 @@ function stlPlotTimecourseSpeciesQuantilesTree(sbmlModel, obs, opts, Q, iteratio
         genT = repmat([Inf, -Inf],[generations 1]);
         for i=1:N_cells
             generation = ceil(log2(i+1));
-            [curMin, curMax] = minmax(Q{i,2},1);
+            curMin = min(Q{i,2});
+            curMax = max(Q{i,2});
             if (curMin < genT(generation,1))
                 genT(generation,1) = curMin;
             end
@@ -71,7 +72,12 @@ function stlPlotTimecourseSpeciesQuantilesTree(sbmlModel, obs, opts, Q, iteratio
         end
         suptitle(speciesName);
         if (opts.SavePlots)
-            filePath = fullfile(opts.OutDir,'speciesquantilestree', [int2str(sIdx) '_' int2str(iteration) '.png']);
+            if ~isempty(iteration)
+                outFile = [speciesName '_' int2str(iteration) '.png'];
+            else
+                outFile = [speciesName '.png'];
+            end
+            filePath = fullfile(opts.OutDir,'speciesquantilestree', outFile);
             %saveas(hFig, filePath);
             hFig.PaperPositionMode = 'auto';
             print(filePath,'-dpng','-r150')            
