@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" version="4">
+  <annotation>
+    <SimBiology xmlns="http://www.mathworks.com">
+      <Version Major="5" Minor="2" Point="0"/>
+    </SimBiology>
+  </annotation>
+  <model id="Nanog" name="Nanog">
+    <listOfCompartments>
+      <compartment id="unnamed" name="unnamed" size="1"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="DNA_on" name="DNA_on" compartment="unnamed" initialAmount="0"/>
+      <species id="DNA_off" name="DNA_off" compartment="unnamed" initialAmount="0"/>
+      <species id="RNA" name="RNA" compartment="unnamed" initialAmount="0"/>
+      <species id="Protein" name="Protein" compartment="unnamed" initialAmount="0"/>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter id="k_on" name="k_{on}" value="10"/>
+      <parameter id="k_off" name="k_{off}" value="1e-4"/>
+      <parameter id="k_m" name="k_m" value="100"/>
+      <parameter id="g_m" name="g_m" value="3"/>
+      <parameter id="k_p" name="k_p" value="1000"/>
+      <parameter id="g_p" name="g_p" value="0.4"/>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction id="R1" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="DNA_off"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="DNA_on"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> k_on </ci>
+              <ci> DNA_off </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="R2" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="DNA_on"/>
+          <speciesReference species="Protein" stoichiometry="2"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="DNA_off"/>
+          <speciesReference species="Protein" stoichiometry="2"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> k_off </ci>
+              <ci> DNA_on </ci>
+              <ci> Protein^2 </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="R3" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="DNA_on"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="DNA_on"/>
+          <speciesReference species="RNA"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> k_m </ci>
+              <ci> DNA_on </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="R4" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="RNA"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> g_m </ci>
+              <ci> RNA </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="R5" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="RNA"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="RNA"/>
+          <speciesReference species="Protein"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> k_p </ci>
+              <ci> RNA </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="R6" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="Protein"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> g_p </ci>
+              <ci> Protein </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>

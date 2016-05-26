@@ -1,0 +1,382 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>STILT 1.0: Installation and tutorial</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-12"><meta name="DC.source" content="tutorial.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>STILT 1.0: Installation and tutorial</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Introduction</a></li><li><a href="#2">Installation</a></li><li><a href="#3">SBML model</a></li><li><a href="#4">Data</a></li><li><a href="#5">Configuration</a></li><li><a href="#12">Running the particle filter</a></li><li><a href="#13">Plot</a></li><li><a href="#18">Model comparison with Bayes factors</a></li></ul></div><h2>Introduction<a name="1"></a></h2><p>This document contains information about the installation and usage of STILT.  For details on the method please see TODO: citation</p><h2>Installation<a name="2"></a></h2><p>The STILT toolbox is a set of Matlab scripts/functions and is 'installed' by copying and adding the directory to Matlab's search path. Furthermore, the stochastic simulation within STILT can (optionally) be accelerated by compiling Matlab's Poisson random number function (poissrnd). Installation and compilation can be performed by running the script <i>init.m</i> in STILTs top-level directory.</p><p>Before you run init.m, you can configure the following variables (found in init.m):</p><div><ul><li>SAVE_PATH = true | false</li><li>COMPILE_POISSONRND = true | false</li></ul></div><p>STILT uses libSBML-5.12.0 to load SBML models. If another compatible version of this library is installed on the Matlab path, the directory /thirdparty/libSBML-5.12.0-matlab can be deleted.</p><h2>SBML model<a name="3"></a></h2><p>STILT reads SBML files via <a href="http://sbml.org/Software/libSBML/docs/matlab-api/">libSBML</a> and uses the species, parameters and reactions definitions contained within. The information is used for STILT's options initialization and for the generation of a model specific forward simulation function (from stoichiometry and reaction definition).</p><p>Biochemical species for which there is no net change in copy number should nevertheless be specified as educt and product when necessary for a reaction to proceed. For example, for the reaction <b>X + Y --&gt; X + Z</b> the species <b>X</b> is both educt and product. The definition of reaction rates is imported from <i>kineticlaw.formula</i> field of the reaction definition with in the SBML file. Use Latex syntax in the names of species and parameters for plotting.  See examples/Nanog/NoFeedback.xml and examples/Nanog/NegativeFeedback.xml for example SBML model configuration.</p><h2>Data<a name="4"></a></h2><p>Experimental data used for parameter inference is specified as a Matlab structure with the fields <i>time</i>, <i>cellNr</i> and <i>inspected</i>, which must be vectors of equal length. The <i>ith</i> entry of each of these vectors specifies a single observation at time <i>time(i)</i> of the cell with index <i>cellNr(i)</i>. Cellular genealogy is introduced via the field <i>cellNr</i>, such that the parent cell with index <i>j</i> gives rise to daughter cells with indices <i>2*j</i> and <i>2*j+1</i>, e.g. cell 1 has daughter cells 2 and 3. If the observation is to be censored (i.e. not used for inference), the field <i>inspected(i)</i> should be set to 0, otherwise 1. For each observed species one field with the species' name and one with the species' name plus a postfix <i>Sigma</i> containing the measurement noise magnitudes at each time point should also be included in the data structure (see example below). Example structure with a single observed species named "Protein" and 147 observationst:</p><pre>          time: [1x147 double]
+        cellNr: [1x147 double]
+       Protein: [1x147 double]
+     inspected: [1x147 double]
+  ProteinSigma: 200</pre><h2>Configuration<a name="5"></a></h2><p>The tutorial contains the steps necessary to perform model selection on lineage tree data as shown in the publication.</p><p>
+<h3>Working directory, model, data</h3>
+</p><p>STILT requires an SBML model definition and the measurement data as input. Data an either be specified by creating a data structure with the fields above, or by using the function <i>stlLoadData</i> to load a .mat file containing a structure named <i>data</i> with the required format. <i>stlLoadData</i> also verifies that the data are correctly formatted.</p><pre class="codeinput"><span class="comment">% Our working directory. Everything (including results) stored in there.</span>
+exampleDir = <span class="string">'examples\Nanog\'</span>;
+<span class="comment">% Name of the currently analyzed model</span>
+modelName = <span class="string">'NoFeedback'</span>;
+<span class="comment">% Load SBML via libSBML</span>
+sbmlModel = TranslateSBML(fullfile(exampleDir, [modelName,<span class="string">'.xml'</span>]));
+<span class="comment">% Load data from mat file.</span>
+data = stlLoadData(fullfile(exampleDir,[modelName <span class="string">'_Sim_Protein.mat'</span>]),<span class="string">'data'</span>);
+</pre><p>
+<h3>Create options structure</h3>
+</p><p>The function <i>stlOptions</i> creates a structure with all options available in STILT set to their default values.  It requires the following three arguments in the specified order: i) the <i>sbmlModel</i>, ii) the <i>data</i> structure, and iii) the number of particles to use for inference.</p><pre class="codeinput"><span class="comment">% Create options template from model, data and particle number</span>
+opts = stlOptions(sbmlModel, data, 7e5);
+<span class="comment">% Set output directory for results (figures, data, etc will be in subdirectories)</span>
+opts.OutDir = fullfile(exampleDir, [modelName <span class="string">'_Results'</span>]);
+</pre><p>
+<h3>Configure parameter priors</h3>
+</p><p>The function <i>stlOptions</i> creates empty entries for each of the parameters in <i>sbmlModel</i>. Set individual parameter's fields using the function <i>stlSetOptParam</i>(<i>opt</i>, <i>ParameterName</i>, <i>FieldName</i>, <i>FieldValue</i>) as shown below. The hyperparameters of the gamma prior distributions (<img src="tutorial_eq08163393176059642704.png" alt="$$ \alpha $$">, <img src="tutorial_eq16707109699945609062.png" alt="$$ \beta $$">) for each model parameter should be configured as shown below.</p><pre class="codeinput">opts = stlSetOptParam(opts, <span class="string">'k_on'</span>, <span class="string">'GammaPrior'</span>, [5, 2]); <span class="comment">% DNA on rate</span>
+opts = stlSetOptParam(opts, <span class="string">'k_off'</span>, <span class="string">'GammaPrior'</span>, [5, 2]); <span class="comment">% DNA off rate</span>
+opts = stlSetOptParam(opts, <span class="string">'k_m'</span>, <span class="string">'GammaPrior'</span>, [12, 0.2]); <span class="comment">% mRNA birth rate</span>
+opts = stlSetOptParam(opts, <span class="string">'g_m'</span>, <span class="string">'GammaPrior'</span>, [7, 1.0]); <span class="comment">% mRNA death rate</span>
+opts = stlSetOptParam(opts, <span class="string">'k_p'</span>, <span class="string">'GammaPrior'</span>, [4.3, 0.005]); <span class="comment">% protein birth rate</span>
+opts = stlSetOptParam(opts, <span class="string">'g_p'</span>, <span class="string">'GammaPrior'</span>, [5, 5]); <span class="comment">% protein death rate</span>
+
+<span class="comment">% Set the field _TrueParamValuesInModel_ in the options for STILT to _true_</span>
+<span class="comment">% if the numeric parameter values from SBML are assumed to be correct</span>
+<span class="comment">% (i.e. when using synthetic data for which the correct parameters are known)</span>
+<span class="comment">% and should be plotted, e.g. in the parameter posterior plot.</span>
+</pre><p>
+<h3>Configure species' initalization</h3>
+</p><p>The function <i>stlSetOptSpecies</i>(<i>opt</i>, <i>ParameterName</i>, <i>FieldName</i>, <i>FieldValue</i>) can be used to configure the behavior of individual species in the options structure. Options are specified as name/value (<i>FieldName</i>,_FieldValue_) pairs. The field 'Init' contains a Matlab command (as string), which is evaluated at runtime for particle initialzation. The number of particles specified at run time can be accessed with the variable <i>P</i>. The variables '&lt;SpeciesName&gt;1' and '&lt;SpeciesName&gt;Sigma1' contain the first data point for each measured species. Previously initialized variables (each a P-by-1 vector) can be referenced via their species' names.</p><pre class="codeinput">opts = stlSetOptSpecies(opts, <span class="string">'DNA_on'</span>, <span class="string">'Init'</span>, <span class="string">'binornd(1, 0.5, [P,1])'</span>);
+opts = stlSetOptSpecies(opts, <span class="string">'DNA_off'</span>, <span class="string">'Init'</span>, <span class="string">'1-DNA_on'</span>);
+opts = stlSetOptSpecies(opts, <span class="string">'RNA'</span>, <span class="string">'Init'</span>, <span class="string">'randi(50,P,1)'</span>);
+opts = stlSetOptSpecies(opts, <span class="string">'Protein'</span>, <span class="string">'Init'</span>, <span class="string">'max(0,round(normrnd(Protein1, ProteinSigma1, [P, 1])))'</span>);
+</pre><p>
+<h3>Configure cell division</h3>
+</p><p>STILT currently supports two modes of cell division possible for each simulated species. They may be configured for each species individually via the field 'Division' in the STILT options structure:</p><div><ul><li>'copy' ... (default) the mother's content is copied to both daughter cells (e.g. for DNA)</li><li>'binomial' ... the mother's content M is split binomially between the daughters. B(M, 0.5) (if M &gt; 100 approximated with a normal distribution.)</li><li>'binomial' with the oarameter <i>p</i> specified using the additional name/value pair <i>DivisionParameters</i>.</li></ul></div><pre class="codeinput">opts = stlSetOptSpecies(opts, <span class="string">'RNA'</span>, <span class="string">'Division'</span>, <span class="string">'binomial'</span>);
+<span class="comment">% opts = stlSetOptSpecies(opts, 'Protein', 'Division', 'binomial'); % default p = 0.5</span>
+opts = stlSetOptSpecies(opts, <span class="string">'Protein'</span>, <span class="string">'Division'</span>, <span class="string">'binomial'</span>, <span class="string">'DivisionParameters'</span>, <span class="string">'p=0.5'</span>); <span class="comment">% specify p explicitly</span>
+</pre><p>
+<h3>Prepare forward simulation</h3>
+</p><p>STILT's particle filter is based on stochastic simulation (performed by the function <i>stlTauLeaping</i>). The function <i>stlCreateSimulationFunction</i> generates code for performing stochastic simulation using the information contained in <i>sbmlModel</i> (i.e. the stoichiometry and reaction propensity). The field_opts.fSimulate_ contains a function handle to these simulation files.</p><pre class="codeinput">opts = stlCreateSimulationFunction(sbmlModel, opts, exampleDir, modelName);
+
+<span class="comment">% Change the parameters _ShowPlotsWhileFiltering_ and _SavePlotsWhileFiltering_ to</span>
+<span class="comment">% generate and save plots, respectively, while running the algorithm.</span>
+opts.ShowPlotsWhileFiltering = 1;
+opts.SavePlotsWhileFiltering = 1;
+</pre><h2>Running the particle filter<a name="12"></a></h2><p>The function <i>stlParticleFilterTree</i> performs the parameter inference. As a result, it generates a results structure <i>res</i> which consists of the following fields:</p><div><ul><li><i>c</i> ... a matrix of samples from the parameters' posterior distributions (particles-by-parameters)</li><li><i>w</i> ... a vector of weights for the individual particles (particles-by-1)</li><li><i>alpha</i>, <i>beta</i>  ... the hyperparameters of each particle's gamma distribution, (particles-by-1) each</li><li><i>Q</i> ... a matrix of quantiles of the distributions of the simulated system state for each cell (timepoints-by-species-by-quantiles)</li><li><i>obs</i> ... <i>data</i> re-structured cell oriented for plotting</li></ul></div><pre class="codeinput"><span class="comment">% configure _LatentQuantilesPerTimestep_ &gt;= 1 to configure the number of</span>
+<span class="comment">% timesteps to use for interpolating between observations (helps smooth</span>
+<span class="comment">% estimated trajectories).</span>
+opts.LatentQuantilesPerTimestep=1;
+<span class="comment">% run the particle filter</span>
+res = stlParticleFilterTree(sbmlModel, data, opts);
+</pre><h2>Plot<a name="13"></a></h2><p>
+<h3>Posterior of parameters</h3>
+</p><p><i>stlPlotPosterior</i> plots samples from each parameter's posterior (black), its true value (if known, red vertical line), the prior (red dashed line) and the prior mean (blue vertical line).</p><pre class="codeinput">stlPlotPosterior(res.c, sbmlModel, opts, []);
+</pre><p><img vspace="5" hspace="5" src="parameter_posterior.png" alt=""> </p><p>
+<h3>Plot prediction and (if available) measurements for all species</h3>
+</p><p><i>stlPlotTimecourseSpeciesQuantilesTree</i> generates a plot with the time course of simulation predictions (and measurements) arranged per cell in a tree format for each individual species.</p><pre class="codeinput">stlPlotTimecourseSpeciesQuantilesTree(sbmlModel, res.obs, opts, res.Q, []);
+</pre><p><img vspace="5" hspace="5" src="speciesquantiletree.png" alt=""> </p><h2>Model comparison with Bayes factors<a name="18"></a></h2><p>Perform Bayesian model comparison by computing the Bayes factor between two models directly from the marginal log likelihood of the data given the model P(D_i|M_i) returned in <i>stlParticleFilterTree's</i> results.</p><pre class="codeinput">bayesfactor = res1.margLogLik - res2.margLogLik;
+fprintf(<span class="string">'log(Bayes factor) = %d\n'</span>, bayesfactor);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% STILT 1.0: Installation and tutorial
+
+%% Introduction
+% This document contains information about the installation and usage of
+% STILT.  For details on the method please see
+% TODO: citation
+
+%% Installation
+% The STILT toolbox is a set of Matlab scripts/functions and is 'installed'
+% by copying and adding the directory to Matlab's search path. Furthermore,
+% the stochastic simulation within STILT can (optionally) be accelerated by compiling 
+% Matlab's Poisson random number function (poissrnd). Installation and
+% compilation can be performed by running the script _init.m_ in STILTs top-level directory.
+% 
+% Before you run init.m, you can configure the following variables (found in init.m):
+%
+% * SAVE_PATH = true | false 
+% * COMPILE_POISSONRND = true | false  
+%
+% STILT uses libSBML-5.12.0 to load SBML models. If another compatible version of this
+% library is installed on the Matlab path, the directory /thirdparty/libSBML-5.12.0-matlab can
+% be deleted.
+%
+
+%% SBML model
+%
+% STILT reads SBML files via
+% <http://sbml.org/Software/libSBML/docs/matlab-api/ libSBML> and uses the
+% species, parameters and reactions definitions contained within. The information is used for 
+% STILT's options initialization and for the generation of a model specific 
+% forward simulation function (from stoichiometry and reaction definition). 
+%
+% Biochemical species for which there is no net change in copy number should
+% nevertheless be specified as educt and product when necessary for a reaction to proceed. 
+% For example, for the reaction *X + Y REPLACE_WITH_DASH_DASH> X + Z*
+% the species *X* is both educt and product.
+% The definition of reaction rates is imported from _kineticlaw.formula_ field
+% of the reaction definition with in the SBML file. Use Latex syntax in the names of
+% species and parameters for plotting.  See examples/Nanog/NoFeedback.xml
+% and examples/Nanog/NegativeFeedback.xml for example SBML model configuration.
+
+%% Data
+% 
+% Experimental data used for parameter inference is specified as a Matlab structure with 
+% the fields _time_, _cellNr_ and _inspected_, which must be vectors of equal length.
+% The _ith_ entry of each of these vectors specifies a single observation at time _time(i)_
+% of the cell with index _cellNr(i)_.  
+% Cellular genealogy is introduced via the field _cellNr_, such that 
+% the parent cell with index _j_ gives rise to daughter cells with indices _2*j_ and
+% _2*j+1_, e.g. cell 1 has daughter cells 2 and 3. 
+% If the observation is to be censored (i.e. not used for inference),
+% the field _inspected(i)_ should be set to 0, otherwise 1. 
+% For each observed species one field with the species' name and one with the
+% species' name plus a postfix _Sigma_ containing the measurement noise magnitudes at each time point
+% should also be included in the data structure (see example below). 
+% Example structure with a single observed species named "Protein" and 147 observationst:
+%
+%            time: [1x147 double]
+%          cellNr: [1x147 double]
+%         Protein: [1x147 double]
+%       inspected: [1x147 double]
+%    ProteinSigma: 200
+
+%% Configuration
+% The tutorial contains the steps necessary to perform model selection
+% on lineage tree data as shown in the publication. 
+
+%%
+% <html>
+% <h3>Working directory, model, data</h3>
+% </html>
+%
+% STILT requires an SBML model definition and the measurement data as input.
+% Data an either be specified by creating a data structure with the fields above,
+% or by using the function _stlLoadData_ to load a .mat file containing a structure named _data_ with the 
+% required format. _stlLoadData_ also verifies that the data are correctly
+% formatted.
+
+% Our working directory. Everything (including results) stored in there.
+exampleDir = 'examples\Nanog\';
+% Name of the currently analyzed model
+modelName = 'NoFeedback';
+% Load SBML via libSBML
+sbmlModel = TranslateSBML(fullfile(exampleDir, [modelName,'.xml']));
+% Load data from mat file.
+data = stlLoadData(fullfile(exampleDir,[modelName '_Sim_Protein.mat']),'data');
+
+%%
+% <html>
+% <h3>Create options structure</h3>
+% </html>
+%
+% The function _stlOptions_ creates a structure with all options available
+% in STILT set to their default values.  It requires the following three arguments
+% in the specified order: i) the _sbmlModel_, ii) the _data_ structure, and iii) the number of 
+% particles to use for inference.
+
+% Create options template from model, data and particle number
+opts = stlOptions(sbmlModel, data, 7e5);
+% Set output directory for results (figures, data, etc will be in subdirectories)
+opts.OutDir = fullfile(exampleDir, [modelName '_Results']);
+
+%%
+% <html>
+% <h3>Configure parameter priors</h3>
+% </html>
+%
+% The function _stlOptions_ creates empty entries for each of the parameters in
+% _sbmlModel_. Set individual parameter's fields using the function 
+% _stlSetOptParam_(_opt_, _ParameterName_, _FieldName_, _FieldValue_) as shown below. 
+% The hyperparameters of the gamma prior distributions ($$ \alpha $$, $$ \beta $$)
+% for each model parameter should be configured as shown below.
+
+opts = stlSetOptParam(opts, 'k_on', 'GammaPrior', [5, 2]); % DNA on rate 
+opts = stlSetOptParam(opts, 'k_off', 'GammaPrior', [5, 2]); % DNA off rate 
+opts = stlSetOptParam(opts, 'k_m', 'GammaPrior', [12, 0.2]); % mRNA birth rate
+opts = stlSetOptParam(opts, 'g_m', 'GammaPrior', [7, 1.0]); % mRNA death rate
+opts = stlSetOptParam(opts, 'k_p', 'GammaPrior', [4.3, 0.005]); % protein birth rate 
+opts = stlSetOptParam(opts, 'g_p', 'GammaPrior', [5, 5]); % protein death rate
+
+% Set the field _TrueParamValuesInModel_ in the options for STILT to _true_
+% if the numeric parameter values from SBML are assumed to be correct
+% (i.e. when using synthetic data for which the correct parameters are known)
+% and should be plotted, e.g. in the parameter posterior plot.  
+
+
+%%
+% <html>
+% <h3>Configure species' initalization</h3>
+% </html>
+%
+% The function _stlSetOptSpecies_(_opt_, _ParameterName_, _FieldName_, _FieldValue_) can be
+% used to configure the behavior of individual species in the options
+% structure. Options are specified as name/value (_FieldName_,_FieldValue_) pairs.
+% The field 'Init' contains a Matlab command (as string), which
+% is evaluated at runtime for particle initialzation. The number of particles
+% specified at run time can be accessed with the variable _P_. 
+% The variables '<SpeciesName>1' and
+% '<SpeciesName>Sigma1' contain the first data point for each measured
+% species. Previously initialized variables (each a P-by-1 vector) can be
+% referenced via their species' names.
+
+opts = stlSetOptSpecies(opts, 'DNA_on', 'Init', 'binornd(1, 0.5, [P,1])');
+opts = stlSetOptSpecies(opts, 'DNA_off', 'Init', '1-DNA_on');
+opts = stlSetOptSpecies(opts, 'RNA', 'Init', 'randi(50,P,1)');
+opts = stlSetOptSpecies(opts, 'Protein', 'Init', 'max(0,round(normrnd(Protein1, ProteinSigma1, [P, 1])))');
+
+%%
+% <html>
+% <h3>Configure cell division</h3>
+% </html>
+%
+% STILT currently supports two modes of cell division possible for each simulated species.
+% They may be configured for each species individually via the field 'Division' in the STILT options structure: 
+%
+% * 'copy' ... (default) the mother's content is copied to both daughter cells (e.g. for DNA)
+% * 'binomial' ... the mother's content M is split binomially between the 
+% daughters. B(M, 0.5) (if M > 100 approximated with a normal distribution.)
+% * 'binomial' with the oarameter _p_ specified using the additional
+% name/value pair _DivisionParameters_.
+opts = stlSetOptSpecies(opts, 'RNA', 'Division', 'binomial');
+% opts = stlSetOptSpecies(opts, 'Protein', 'Division', 'binomial'); % default p = 0.5
+opts = stlSetOptSpecies(opts, 'Protein', 'Division', 'binomial', 'DivisionParameters', 'p=0.5'); % specify p explicitly
+%%
+% <html>
+% <h3>Prepare forward simulation</h3>
+% </html>
+%
+% STILT's particle filter is based on stochastic simulation (performed by
+% the function _stlTauLeaping_). The function _stlCreateSimulationFunction_ generates code for performing 
+% stochastic simulation using the information contained in _sbmlModel_ (i.e. the stoichiometry and reaction propensity).
+% The field_opts.fSimulate_ contains a function handle to these simulation files.
+
+opts = stlCreateSimulationFunction(sbmlModel, opts, exampleDir, modelName);
+
+% Change the parameters _ShowPlotsWhileFiltering_ and _SavePlotsWhileFiltering_ to
+% generate and save plots, respectively, while running the algorithm.
+opts.ShowPlotsWhileFiltering = 1;
+opts.SavePlotsWhileFiltering = 1;
+
+%% Running the particle filter
+% The function _stlParticleFilterTree_ performs the parameter inference.
+% As a result, it generates a results structure _res_ which consists of the
+% following fields:
+%
+% * _c_ ... a matrix of samples from the parameters' posterior
+% distributions (particles-by-parameters)
+% * _w_ ... a vector of weights for the individual particles
+% (particles-by-1)
+% * _alpha_, _beta_  ... the hyperparameters of each particle's gamma distribution, (particles-by-1) each
+% * _Q_ ... a matrix of quantiles of the distributions of the simulated
+% system state for each cell (timepoints-by-species-by-quantiles)
+% * _obs_ ... _data_ re-structured cell oriented for plotting
+
+% configure _LatentQuantilesPerTimestep_ >= 1 to configure the number of
+% timesteps to use for interpolating between observations (helps smooth
+% estimated trajectories).
+opts.LatentQuantilesPerTimestep=1;
+% run the particle filter
+res = stlParticleFilterTree(sbmlModel, data, opts);
+
+%% Plot
+
+%%
+% <html>
+% <h3>Posterior of parameters</h3>
+% </html>
+%
+% _stlPlotPosterior_ plots samples from each parameter's posterior (black),
+% its true value (if known, red vertical line), the prior (red dashed line)
+% and the prior mean (blue vertical line).
+
+stlPlotPosterior(res.c, sbmlModel, opts, []);
+
+%%
+% 
+% <<parameter_posterior.png>>
+%
+
+%%
+% <html>
+% <h3>Plot prediction and (if available) measurements for all species</h3>
+% </html>
+%
+% _stlPlotTimecourseSpeciesQuantilesTree_ generates a plot with the time course 
+% of simulation predictions (and measurements) arranged per cell in a tree
+% format for each individual species.
+
+stlPlotTimecourseSpeciesQuantilesTree(sbmlModel, res.obs, opts, res.Q, []);
+
+%%
+% 
+% <<speciesquantiletree.png>>
+%
+
+%% Model comparison with Bayes factors
+% 
+% Perform Bayesian model comparison by computing the Bayes factor between two
+% models directly from the marginal log likelihood of the data given the
+% model P(D_i|M_i) returned in _stlParticleFilterTree's_ results.
+
+bayesfactor = res1.margLogLik - res2.margLogLik;
+fprintf('log(Bayes factor) = %d\n', bayesfactor);
+
+##### SOURCE END #####
+--></body></html>
