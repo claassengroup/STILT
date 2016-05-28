@@ -66,10 +66,11 @@ function [pData, synlogLiks, dataLogLik] = stlGoodnessOfFitTest(sbmlModel, data,
     
     %% generate synthetic trees
     sim_data = cell(SampleNr,1);
-
-    for k=1:SampleNr
+    disp('Generating synthetic trees...')
+    parfor k=1:SampleNr
+%         sim_data{k} = stlSimulateDataSet(X0s(k,:), theta, NGen, obs.time, opts, sbmlModel);
         simtree = stlSimulateTree(X0s(k,:), theta, NGen, obs.time, opts, sbmlModel);
-        sim_data{k} = convertSimToData(simtree, obssigmas, opts);
+        sim_data{k} = stlConvertSimToData(simtree, obssigmas, opts);
     end
 
     if mean_type == 1 % geometric
@@ -80,14 +81,21 @@ function [pData, synlogLiks, dataLogLik] = stlGoodnessOfFitTest(sbmlModel, data,
     
     %% compute the conditional log likelihoods for each synthetic data set 
     synlogLiks = zeros(SampleNr,1);
+    
+    % disable parallel workers in the tree likelihood computation
+    opts.ParallelWorkers = 1;
+    disp('Computing likelihood of simulated data sets...')
+    tic
     parfor k=1:SampleNr
-        tic
+%         tic
+%         fprintf('.')
         res = stlParticleFilterTree(sbmlModel, sim_data{k}, opts, theta);
         synlogLiks(k) = fMean(res.margLogLik,length(res.meanLogLik)); 
-        t=toc;
-        fprintf('l=%f [%f s]\n', synlogLiks(k), t)
+%         t=toc;
+%         fprintf('x')
+%         fprintf('l=%f [%f s]\n', synlogLiks(k), t)
     end
-    
+    toc
     %% compute the conditional log likelihoods for data
     res = stlParticleFilterTree(sbmlModel, data, opts, theta);
     dataLogLik = fMean(res.margLogLik,length(res.meanLogLik)); 
@@ -97,30 +105,11 @@ function [pData, synlogLiks, dataLogLik] = stlGoodnessOfFitTest(sbmlModel, data,
     [x, ix] = unique(x);
     f = f(ix);
     pData=interp1(x,f,dataLogLik);
-end
-
-function [data] = convertSimToData(simtree, sigmas, opts)
-
-    extractSpecies = find(cellfun(@(c) ~isempty(c), {opts.Species.DataIdx}));
-    
-    Cs = size(simtree,1);
-    data = struct();
-    data.time = [];
-    data.cellNr = [];
-    for sIdx = 1:length(extractSpecies)
-        data.(opts.Species(extractSpecies(sIdx)).Name) = [];
-        data.([opts.Species(extractSpecies(sIdx)).Name 'Sigma']) = [];
-    end    
-    for cIdx = 1:Cs
-        timeStartIdx = 2-(cIdx==1);
-        curTime = simtree{cIdx,2}(timeStartIdx:end);
-        data.time = [data.time;curTime]; 
-        data.cellNr = [data.cellNr;cIdx*ones(length(curTime),1)]; 
-        for sIdx = 1:length(extractSpecies)
-        	data.(opts.Species(extractSpecies(sIdx)).Name) = [data.(opts.Species(extractSpecies(sIdx)).Name);simtree{cIdx,3}(timeStartIdx:end,extractSpecies(sIdx))];
-            data.([opts.Species(extractSpecies(sIdx)).Name 'Sigma']) = [data.([opts.Species(extractSpecies(sIdx)).Name 'Sigma']);sigmas.(opts.Species(extractSpecies(sIdx)).Name){cIdx}];
-        end
+    if all(dataLogLik<x)
+        pData=0;
+    elseif all(dataLogLik>x)
+        pData=1;
     end
-    data.inspected = ones(length(data.time),1);
 end
+
 

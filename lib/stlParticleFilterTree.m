@@ -23,6 +23,13 @@ function [ results ] = stlParticleFilterTree(sbmlModel, data, opts, varargin )
     if (~isempty(varargin))
         SampleParameters = 0;
         FixedParameters = repmat(varargin{1}, [PNr, 1]);
+        
+        % dont save anything or plot anything
+        opts.Save=0;
+        opts.SavePlotsWhileFiltering=0;
+        opts.SaveX=0;
+        opts.SavePlotsWhileFiltering=0;
+        opts.ShowPlotsWhileFiltering=0;        
     else
         SampleParameters = 1;
     end
@@ -113,7 +120,9 @@ function [ results ] = stlParticleFilterTree(sbmlModel, data, opts, varargin )
     %% loop over time    
     for i=1:TNr-1
 
-        fprintf('i=%d\n',i)
+        if SampleParameters % don't output iteration # when doing the GOF test
+            fprintf('i=%d\n',i)
+        end
 
         % sample the particles for the next iteration
         N_cells = length(cells);
@@ -148,7 +157,9 @@ function [ results ] = stlParticleFilterTree(sbmlModel, data, opts, varargin )
         for itIdx = 1:intermTNo
             curDt = diff(intermT([itIdx itIdx+1]));
             for k=1:N_cells
-                tic
+                if SampleParameters
+                    tic
+                end
                 Xout_j   = cell(1,J);
                 r_k_j    = cell(1,J);
                 int_g_k_j= cell(1,J);
@@ -169,8 +180,9 @@ function [ results ] = stlParticleFilterTree(sbmlModel, data, opts, varargin )
                 Xout = vertcat(Xout_j{:});
                 r_k  = vertcat(r_k_j{:});
                 int_g_k = vertcat(int_g_k_j{:});
-                toc
-
+                if SampleParameters
+                    toc
+                end
                 r = r+r_k;
                 int_g = int_g+int_g_k;
                 X{k} = Xout;
@@ -269,7 +281,7 @@ function [ results ] = stlParticleFilterTree(sbmlModel, data, opts, varargin )
         end
         
         meanW(i+1) = log(mean(exp(w_raw-max(w_raw))))+max(w_raw);
-        
+               
         if (opts.SaveX)
             % save the statistics of the accepted particles latent trajectories
             clear f x

@@ -6,7 +6,8 @@ function data = simulateDataSet(X0, theta, NGen, timesParams, opts, sbmlModel, s
 % theta ... vector of parameters
 % NGen ... number of generations
 % timeParams ... cell array (1x3) giving mean and std of life times of each
-%  cell, and the observation interval dt
+%  cell, and the observation interval dt.  If timeParams is a vector then
+%  use this vector of times instead.
 % opts ... STILT options structure
 % sbmlModel ... SBML model
 % sigmas... a vector of constant measurement errors to add to each

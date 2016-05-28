@@ -176,6 +176,9 @@ dt = 0.5; % observation frequency
 simData_NoFeedback = stlSimulateDataSet(X0, theta, 3, {muCellLife, stdCellLife, dt}, ... 
     optsNoFeedback, sbmlModelNoFeedback, 500);
 
+
+
+
 %%
 % <html>
 % <h3>Configure parameter priors</h3>
@@ -351,3 +354,49 @@ fprintf('Log P(no feedback) - Log P(neg feedback): %f\n', resNoFeedback_Null.mar
 fprintf('Log P(neg feedback) - Log P(no feedback): %f\n', resNegFeedback_Neg.margLogLik - resNegFeedback_Null.margLogLik)
 %%
 %  Log P(neg feedback) - Log P(no feedback): 32.333551
+
+%% Goodness of fit testing
+% Lastly we use the goodness of fit test to test the compatability of each
+% model with each of the simulated data sets.
+% The plots show the distribution of likelihood of synthetic data sets normalized by number of transitions.
+% The likelihood of the observed data are shown as a vertical line.  In this example,
+% the goodness of fit test shows that the No Feedback model fits well to
+% data simulated from that model, and the Negative Feedback model fits well
+% to data simulated from it.  Conversely, the Negative Feedback model does
+% not fit well when fit to data from the No Feedback model.
+% However, the No Feedback model cannot be rejected on the basis of the fit
+% to the Negative Feedback model.
+
+NoFeedbackNull = struct('pData',[],'synLogLiks',[],'dataLogLik',[]);
+NoFeedbackNeg = struct('pData',[],'synLogLiks',[],'dataLogLik',[]);
+NegFeedbackNull = struct('pData',[],'synLogLiks',[],'dataLogLik',[]);
+NegFeedbackNeg = struct('pData',[],'synLogLiks',[],'dataLogLik',[]);
+
+[NoFeedbackNull.pData, NoFeedbackNull.synlogLiks, NoFeedbackNull.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNoFeedback, simData_NoFeedback, resNoFeedback_Null, optsNoFeedback);
+[NoFeedbackNeg.pData, NoFeedbackNeg.synlogLiks, NoFeedbackNeg.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNegativeFeedback, simData_NoFeedback, resNoFeedback_Neg, optsNegFeedback);
+[NegFeedbackNull.pData, NegFeedbackNull.synlogLiks, NegFeedbackNull.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNoFeedback, simData_NegFeedback, resNegFeedback_Null, optsNoFeedback);
+[NegFeedbackNeg.pData, NegFeedbackNeg.synlogLiks, NegFeedbackNeg.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNegativeFeedback, simData_NegFeedback, resNegFeedback_Neg, optsNegFeedback);
+
+%%
+figure
+subplot(2,2,1)
+ksdensity(NoFeedbackNull.synlogLiks)
+line(ones(1,2)*NoFeedbackNull.dataLogLik, get(gca,'YLim'))
+title(sprintf('Sim No Feedback\nFit No Feedback\np=%f', NoFeedbackNull.pData))
+subplot(2,2,2)
+ksdensity(NoFeedbackNeg.synlogLiks)
+line(ones(1,2)*NoFeedbackNeg.dataLogLik, get(gca,'YLim'))
+title(sprintf('Sim No Feedback\nFit Negative Feedback\np=%f', NoFeedbackNeg.pData))
+subplot(2,2,3)
+ksdensity(NegFeedbackNull.synlogLiks)
+line(ones(1,2)*NegFeedbackNull.dataLogLik, get(gca,'YLim'))
+title(sprintf('Sim Negative Feedback\nFit No Feedback\np=%f', NegFeedbackNull.pData))
+subplot(2,2,4)
+ksdensity(NegFeedbackNeg.synlogLiks)
+line(ones(1,2)*NegFeedbackNeg.dataLogLik, get(gca,'YLim'))
+title(sprintf('Sim Negative Feedback\nFit Negative Feedback\np=%f', NegFeedbackNeg.pData))
+
+%%
+% 
+% <<GOF.PNG>>
+% 

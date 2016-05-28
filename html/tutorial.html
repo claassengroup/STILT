@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>STILT 1.0: Installation and tutorial</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-26"><meta name="DC.source" content="tutorial.m"><style type="text/css">
+      --><title>STILT 1.0: Installation and tutorial</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-05-28"><meta name="DC.source" content="tutorial.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>STILT 1.0: Installation and tutorial</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Introduction</a></li><li><a href="#2">Installation</a></li><li><a href="#3">SBML model</a></li><li><a href="#4">Data</a></li><li><a href="#5">Configuration</a></li><li><a href="#11">Generating synthetic data</a></li><li><a href="#14">Configure saving and showing plots</a></li><li><a href="#15">Running the particle filter</a></li><li><a href="#17">Plotting the results</a></li><li><a href="#22">Negative Feedback model</a></li><li><a href="#23">Model comparison</a></li></ul></div><h2>Introduction<a name="1"></a></h2><p>This document contains information about the installation and usage of STILT.  For details on the method please see TODO: citation</p><h2>Installation<a name="2"></a></h2><p>The STILT toolbox is a set of Matlab scripts/functions and is 'installed' by copying and adding the directory to Matlab's search path. Furthermore, the stochastic simulation within STILT can (optionally) be accelerated by compiling Matlab's Poisson random number function (poissrnd). Installation and compilation can be performed by running the script <i>init.m</i> in STILTs top-level directory.</p><p>Before you run init.m, you can configure the following variables (found in init.m):</p><div><ul><li>SAVE_PATH = true | false</li><li>COMPILE_POISSONRND = true | false</li></ul></div><p>STILT uses libSBML-5.12.0 to load SBML models. If another compatible version of this library is installed on the Matlab path, the directory /thirdparty/libSBML-5.12.0-matlab can be deleted.</p><pre class="codeinput">init
+  </style></head><body><div class="content"><h1>STILT 1.0: Installation and tutorial</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Introduction</a></li><li><a href="#2">Installation</a></li><li><a href="#3">SBML model</a></li><li><a href="#4">Data</a></li><li><a href="#5">Configuration</a></li><li><a href="#11">Generating synthetic data</a></li><li><a href="#14">Configure saving and showing plots</a></li><li><a href="#15">Running the particle filter</a></li><li><a href="#17">Plotting the results</a></li><li><a href="#22">Negative Feedback model</a></li><li><a href="#23">Model comparison</a></li><li><a href="#32">Goodness of fit testing</a></li></ul></div><h2>Introduction<a name="1"></a></h2><p>This document contains information about the installation and usage of STILT.  For details on the method please see TODO: citation</p><h2>Installation<a name="2"></a></h2><p>The STILT toolbox is a set of Matlab scripts/functions and is 'installed' by copying and adding the directory to Matlab's search path. Furthermore, the stochastic simulation within STILT can (optionally) be accelerated by compiling Matlab's Poisson random number function (poissrnd). Installation and compilation can be performed by running the script <i>init.m</i> in STILTs top-level directory.</p><p>Before you run init.m, you can configure the following variables (found in init.m):</p><div><ul><li>SAVE_PATH = true | false</li><li>COMPILE_POISSONRND = true | false</li></ul></div><p>STILT uses libSBML-5.12.0 to load SBML models. If another compatible version of this library is installed on the Matlab path, the directory /thirdparty/libSBML-5.12.0-matlab can be deleted.</p><pre class="codeinput">init
 </pre><h2>SBML model<a name="3"></a></h2><p>STILT reads SBML files via <a href="http://sbml.org/Software/libSBML/docs/matlab-api/">libSBML</a> and uses the species, parameters and reactions definitions contained within. The information is used for STILT's options initialization and for the generation of a model specific forward simulation function (from stoichiometry and reaction definition).</p><p>Biochemical species for which there is no net change in copy number should nevertheless be specified as educt and product when necessary for a reaction to proceed. For example, for the reaction <b>X + Y --&gt; X + Z</b> the species <b>X</b> is both educt and product. The definition of reaction rates is imported from <i>kineticlaw.formula</i> field of the reaction definition with in the SBML file. Latex syntax can be used for the names of species and parameters for plotting.  See examples/Nanog/NoFeedback.xml and examples/Nanog/NegFeedback.xml for example SBML model configuration.</p><h2>Data<a name="4"></a></h2><p>Experimental data used for parameter inference is specified as a Matlab structure with the fields <i>time</i>, <i>cellNr</i> and <i>inspected</i>, which must be vectors of equal length. The <i>ith</i> entry of each of these vectors specifies a single observation at time <i>time(i)</i> of the cell with index <i>cellNr(i)</i>. Cellular genealogy is introduced via the field <i>cellNr</i>, such that the parent cell with index <i>j</i> gives rise to daughter cells with indices <i>2*j</i> and <i>2*j+1</i>, e.g. cell 1 has daughter cells 2 and 3. If the observation at time <i>i</i> is to be censored (i.e. not used for inference), the field <i>inspected(i)</i> should be set to 0, otherwise 1. For each observed species one field with the species' name and one with the species' and the suffix <i>Sigma</i> containing the measurement noise magnitudes at each time point should also be included in the data structure (see example below). Example structure with a single observed species named "Protein" and 147 observations:</p><pre>          time: [1x147 double]
         cellNr: [1x147 double]
        Protein: [1x147 double]
@@ -190,7 +190,33 @@ resNegFeedback_Null = stlParticleFilterTree(sbmlModelNoFeedback, simData_Negativ
 <h3>Bayes factor computation</h3>
 </p><p>Finally we perform model comparison using Bayes factors to select between the two models for each data set.</p><p>No Feedback model is true:</p><pre class="codeinput">fprintf(<span class="string">'Log P(no feedback) - Log P(neg feedback): %f\n'</span>, resNoFeedback_Null.margLogLik - resNoFeedback_Neg.margLogLik)
 </pre><pre>Log P(no feedback) - Log P(neg feedback): 112.960154</pre><p>Negative feedback model is true:</p><pre class="codeinput">fprintf(<span class="string">'Log P(neg feedback) - Log P(no feedback): %f\n'</span>, resNegFeedback_Neg.margLogLik - resNegFeedback_Null.margLogLik)
-</pre><pre>Log P(neg feedback) - Log P(no feedback): 32.333551</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+</pre><pre>Log P(neg feedback) - Log P(no feedback): 32.333551</pre><h2>Goodness of fit testing<a name="32"></a></h2><p>Lastly we use the goodness of fit test to test the compatability of each model with each of the simulated data sets. The plots show the distribution of likelihood of synthetic data sets normalized by number of transitions. The likelihood of the observed data are shown as a vertical line.</p><pre class="codeinput">NoFeedbackNull = struct(<span class="string">'pData'</span>,[],<span class="string">'synLogLiks'</span>,[],<span class="string">'dataLogLik'</span>,[]);
+NoFeedbackNeg = struct(<span class="string">'pData'</span>,[],<span class="string">'synLogLiks'</span>,[],<span class="string">'dataLogLik'</span>,[]);
+NegFeedbackNull = struct(<span class="string">'pData'</span>,[],<span class="string">'synLogLiks'</span>,[],<span class="string">'dataLogLik'</span>,[]);
+NegFeedbackNeg = struct(<span class="string">'pData'</span>,[],<span class="string">'synLogLiks'</span>,[],<span class="string">'dataLogLik'</span>,[]);
+
+[NoFeedbackNull.pData, NoFeedbackNull.synlogLiks, NoFeedbackNull.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNoFeedback, simData_NoFeedback, resNoFeedback_Null, optsNoFeedback);
+[NoFeedbackNeg.pData, NoFeedbackNeg.synlogLiks, NoFeedbackNeg.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNegativeFeedback, simData_NoFeedback, resNoFeedback_Neg, optsNegFeedback);
+[NegFeedbackNull.pData, NegFeedbackNull.synlogLiks, NegFeedbackNull.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNoFeedback, simData_NegFeedback, resNegFeedback_Null, optsNoFeedback);
+[NegFeedbackNeg.pData, NegFeedbackNeg.synlogLiks, NegFeedbackNeg.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNegativeFeedback, simData_NegFeedback, resNegFeedback_Neg, optsNegFeedback);
+</pre><pre class="codeinput">figure
+subplot(2,2,1)
+ksdensity(NoFeedbackNull.synlogLiks)
+line(ones(1,2)*NoFeedbackNull.dataLogLik, get(gca,<span class="string">'YLim'</span>))
+title(sprintf(<span class="string">'Sim No Feedback\nFit No Feedback\np=%f'</span>, NoFeedbackNull.pData))
+subplot(2,2,2)
+ksdensity(NoFeedbackNeg.synlogLiks)
+line(ones(1,2)*NoFeedbackNeg.dataLogLik, get(gca,<span class="string">'YLim'</span>))
+title(sprintf(<span class="string">'Sim No Feedback\nFit Negative Feedback\np=%f'</span>, NoFeedbackNeg.pData))
+subplot(2,2,3)
+ksdensity(NegFeedbackNull.synlogLiks)
+line(ones(1,2)*NegFeedbackNull.dataLogLik, get(gca,<span class="string">'YLim'</span>))
+title(sprintf(<span class="string">'Sim Negative Feedback\nFit No Feedback\np=%f'</span>, NegFeedbackNull.pData))
+subplot(2,2,4)
+ksdensity(NegFeedbackNeg.synlogLiks)
+line(ones(1,2)*NegFeedbackNeg.dataLogLik, get(gca,<span class="string">'YLim'</span>))
+title(sprintf(<span class="string">'Sim Negative Feedback\nFit Negative Feedback\np=%f'</span>, NegFeedbackNeg.pData))
+</pre><p><img vspace="5" hspace="5" src="GOF.PNG" alt=""> </p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% STILT 1.0: Installation and tutorial
 
@@ -370,6 +396,9 @@ dt = 0.5; % observation frequency
 simData_NoFeedback = stlSimulateDataSet(X0, theta, 3, {muCellLife, stdCellLife, dt}, ... 
     optsNoFeedback, sbmlModelNoFeedback, 500);
 
+
+
+
 %%
 % <html>
 % <h3>Configure parameter priors</h3>
@@ -545,6 +574,46 @@ fprintf('Log P(no feedback) - Log P(neg feedback): %f\n', resNoFeedback_Null.mar
 fprintf('Log P(neg feedback) - Log P(no feedback): %f\n', resNegFeedback_Neg.margLogLik - resNegFeedback_Null.margLogLik)
 %%
 %  Log P(neg feedback) - Log P(no feedback): 32.333551
+
+%% Goodness of fit testing
+% Lastly we use the goodness of fit test to test the compatability of each
+% model with each of the simulated data sets.
+% The plots show the distribution of likelihood of synthetic data sets normalized by number of transitions.
+% The likelihood of the observed data are shown as a vertical line.
+
+NoFeedbackNull = struct('pData',[],'synLogLiks',[],'dataLogLik',[]);
+NoFeedbackNeg = struct('pData',[],'synLogLiks',[],'dataLogLik',[]);
+NegFeedbackNull = struct('pData',[],'synLogLiks',[],'dataLogLik',[]);
+NegFeedbackNeg = struct('pData',[],'synLogLiks',[],'dataLogLik',[]);
+
+[NoFeedbackNull.pData, NoFeedbackNull.synlogLiks, NoFeedbackNull.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNoFeedback, simData_NoFeedback, resNoFeedback_Null, optsNoFeedback);
+[NoFeedbackNeg.pData, NoFeedbackNeg.synlogLiks, NoFeedbackNeg.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNegativeFeedback, simData_NoFeedback, resNoFeedback_Neg, optsNegFeedback);
+[NegFeedbackNull.pData, NegFeedbackNull.synlogLiks, NegFeedbackNull.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNoFeedback, simData_NegFeedback, resNegFeedback_Null, optsNoFeedback);
+[NegFeedbackNeg.pData, NegFeedbackNeg.synlogLiks, NegFeedbackNeg.dataLogLik] = stlGoodnessOfFitTest(sbmlModelNegativeFeedback, simData_NegFeedback, resNegFeedback_Neg, optsNegFeedback);
+
+%%
+figure
+subplot(2,2,1)
+ksdensity(NoFeedbackNull.synlogLiks)
+line(ones(1,2)*NoFeedbackNull.dataLogLik, get(gca,'YLim'))
+title(sprintf('Sim No Feedback\nFit No Feedback\np=%f', NoFeedbackNull.pData))
+subplot(2,2,2)
+ksdensity(NoFeedbackNeg.synlogLiks)
+line(ones(1,2)*NoFeedbackNeg.dataLogLik, get(gca,'YLim'))
+title(sprintf('Sim No Feedback\nFit Negative Feedback\np=%f', NoFeedbackNeg.pData))
+subplot(2,2,3)
+ksdensity(NegFeedbackNull.synlogLiks)
+line(ones(1,2)*NegFeedbackNull.dataLogLik, get(gca,'YLim'))
+title(sprintf('Sim Negative Feedback\nFit No Feedback\np=%f', NegFeedbackNull.pData))
+subplot(2,2,4)
+ksdensity(NegFeedbackNeg.synlogLiks)
+line(ones(1,2)*NegFeedbackNeg.dataLogLik, get(gca,'YLim'))
+title(sprintf('Sim Negative Feedback\nFit Negative Feedback\np=%f', NegFeedbackNeg.pData))
+
+%%
+% 
+% <<GOF.PNG>>
+% 
 
 ##### SOURCE END #####
 --></body></html>
