@@ -87,13 +87,20 @@ function [X, R, IntG] = simCell(X0, theta, times, reactions, opts)
     Ss = size(X0,2);
     Rs = reactions;
     
-    dts = diff(times);
-    X = zeros(Ts, Ss);
-    X(1,:) = X0;
-    R = zeros(Ts, Rs);    
-    IntG = zeros(Ts, Rs);
+%     dts = diff(times);
+    N = length(times)-1;
+%     X = zeros(Ts, Ss);
+%     X = zeros(Ss, Ts);
+%     X(:,1) = X0;
+%     R = zeros(Ts, Rs);    
+%     R = zeros(Rs,Ts);
+%     IntG = zeros(Ts, Rs);
+%     IntG = zeros(Rs,Ts);
     
-    for tIdx = 1:Ts-1
-        [X(tIdx+1,:), R(tIdx+1,:), IntG(tIdx+1,:)] = opts.fSimulate(X(tIdx,:), theta, dts(tIdx));
-    end
+    [X,~,R,IntG] = opts.fSimulate(X0, theta, times(end), N);
+%     for tIdx = 1:Ts-1        
+% %         [X(tIdx+1,:), R(tIdx+1,:), IntG(tIdx+1,:)] = opts.fSimulate(X(tIdx,:), theta, dts(tIdx));
+%         [X(:,tIdx+1), R(:,tIdx+1), IntG(:,tIdx+1)] = opts.fSimulate(X(:,tIdx)', theta, dts(tIdx));
+%     end
+
 end

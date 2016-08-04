@@ -79,7 +79,7 @@ init
 % formatted.
 
 % Our working directory. Everything (including results) stored in there.
-exampleDir = 'examples\Nanog\';
+exampleDir = fullfile('examples','Nanog');
 % Load SBML via libSBML
 sbmlModelNoFeedback = TranslateSBML(fullfile(exampleDir, 'NoFeedback.xml'));
 % Load data from mat file.
@@ -173,11 +173,10 @@ muCellLife = 12; % mean of cell life time
 stdCellLife = 1; % std of cell life time
 dt = 0.5; % observation frequency
 
+disp('Generating synthetic data')
 simData_NoFeedback = stlSimulateDataSet(X0, theta, 3, {muCellLife, stdCellLife, dt}, ... 
     optsNoFeedback, sbmlModelNoFeedback, 500);
-
-
-
+disp('Done')
 
 %%
 % <html>

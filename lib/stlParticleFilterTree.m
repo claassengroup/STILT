@@ -174,7 +174,10 @@ function [ results ] = stlParticleFilterTree(sbmlModel, data, opts, varargin )
                 end
 
                 parfor j=1:J
-                    [Xout_j{j}, r_k_j{j}, int_g_k_j{j}] = forwardSim(X_k_j{j}, c_k_j{j}, curDt);
+                    [tmpX, ~, tmpR, tmpG] = forwardSim(X_k_j{j}, c_k_j{j}, curDt);
+                    Xout_j{j} = squeeze(tmpX(end,:,:))';
+                    r_k_j{j} = squeeze(tmpR(:,end,:))';
+                    int_g_k_j{j} = squeeze(tmpG(:,end,:))';
                 end
 
                 Xout = vertcat(Xout_j{:});
