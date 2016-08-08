@@ -40,11 +40,36 @@ function mlPrepareModel( modelDir, mexName, sbmlModel, opts )
     mlGenCCode('computePropensities', strSwitch, {{sbmlModel.species.id},{sbmlModel.parameter.id}}, 'f', length(sbmlModel.reaction), true, true, true, fullfile(modelDir, 'computePropensities.cpp'));
 
     mexFuncPath = fullfile(modelDir, [mexName '.' mexext]);
-    mexCmd = ['mex ' modelDir '/*.cpp matLeap/src/*.cpp -I' modelDir '/ -ImatLeap -ImatLeap/boost/ -DMEX -O '];
+    tmp = dir([modelDir '/*.cpp']);
+    tmp = {tmp.name};
+    modelFiles = cellfun(@(s) fullfile(modelDir, s), tmp, 'UniformOutput', false);
+    tmp = dir('matLeap/src/*.cpp');
+    tmp = {tmp.name};
+    matLeapFiles = cellfun(@(s) fullfile('matLeap/src/', s), tmp, 'UniformOutput', false);
+    
+    mexCmd = ['mex ' strjoin([modelFiles, matLeapFiles]) ' -I' modelDir '/ -ImatLeap -ImatLeap/boost/ -DMEX -O '];
+%     mexCmd = ['mex ' modelDir  '/*.cpp matLeap/src/*.cpp -I' modelDir '/ -ImatLeap -ImatLeap/boost/ -DMEX -O '];
+
     if isunix
         mexCmd = [mexCmd '-lut -output ' mexFuncPath];
     else
-        mexCmd = [mexCmd matlabroot '/extern/lib/win32/lcc/libut.lib -output ' mexFuncPath];
+        % windows x32 or x64
+        if strcmp(computer, 'PCWIN')
+            winStr = 'win32';
+        else
+            winStr = 'win64';
+        end
+        
+        % find libut.lib
+        compilerConfiguration = mex.getCompilerConfigurations;
+        
+        if strcmp(compilerConfiguration(1).Manufacturer, 'Microsoft')
+            libDir = 'microsoft';
+        else
+            error('Only microsoft compiler supported')
+        end
+        
+        mexCmd = [mexCmd '"' matlabroot '/extern/lib/' winStr '/' libDir '/libut.lib" -output ' mexFuncPath];
     end
     if (opts.SYM_JAC)
         mexCmd = [mexCmd ' -DINVJ'];
