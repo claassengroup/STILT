@@ -1,6 +1,13 @@
 function mlPrepareModel( modelDir, mexName, sbmlModel, opts )
 
-    [ S, Sed, Prop, ReacDep ] = mlSBML2StoichProp(sbmlModel, true, true);
+    % special case for not replacing RRE with stochastic propensities
+    if opts.USE_RRE
+        doAdaptHomodimerProp = false;
+    else
+        doAdaptHomodimerProp = true;
+    end
+    
+    [ S, Sed, Prop, ReacDep ] = mlSBML2StoichProp(sbmlModel, true, doAdaptHomodimerProp);
 
     % Model definition
     mlGenModelDefh(fullfile(modelDir, 'model_def.h'), length(sbmlModel.species), length(sbmlModel.parameter));

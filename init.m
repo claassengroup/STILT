@@ -25,3 +25,6 @@ if (COMPILE_POISSONRND)
         eval(['codegen poissrnd -args {Lambdatype} -config cfg -o ' PoissrndPath]);   
     end
 end
+
+%% run matLeap init
+run(fullfile('matLeap','init.m'))
