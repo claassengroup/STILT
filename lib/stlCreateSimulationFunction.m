@@ -1,12 +1,19 @@
-function [ opts ] = stlCreateSimulationFunction( sbmlModel, opts, modelDir, modelName )
+function [ opts ] = stlCreateSimulationFunction( sbmlModel, opts, modelDir, modelName, overWriteMex )
 
+    if nargin == 4
+        overWriteMex = false;
+    end
+       
     % use matLeap to create the tau-leaping function
     mexName = ['ml' modelName];
     mlOpts = mlOptions('EPSILON', opts.TauLeapingEpsilon, ...
-        'N_C', opts.TauLeapingCriticalNumber);
+        'N_C', opts.TauLeapingCriticalNumber, 'USE_RRE', opts.USE_RRE);
     
     disp('Preparing model executable')
-    mlPrepareModel( modelDir, mexName, sbmlModel, mlOpts )
+    
+    if ~exist(fullfile(modelDir,[mexName '.' mexext]), 'file') || overWriteMex
+        mlPrepareModel( modelDir, mexName, sbmlModel, mlOpts )
+    end
     disp('Done')
     simFunc = str2func(mexName);
 

@@ -15,6 +15,7 @@ function [ opts ] = mlOptions( varargin )
     opts.N_SSA_2 = 10;
     opts.SSA_ONLY = false;
     opts.SYM_JAC = false;
+    opts.USE_RRE = false;
     
     % Override defaults with specified user inputs
     if (~isempty(varargin))
