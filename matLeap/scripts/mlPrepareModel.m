@@ -73,7 +73,7 @@ function mlPrepareModel( modelDir, mexName, sbmlModel, opts )
         if strcmp(compilerConfiguration(1).Manufacturer, 'Microsoft')
             libDir = 'microsoft';
         else
-            error('Only microsoft compiler supported')
+            error('Only Microsoft Visual Studio compiler supported. Make sure that Microsoft Visual Studio is the default C++ compiler (see mex -setup).')
         end
         
         mexCmd = [mexCmd '"' matlabroot '/extern/lib/' winStr '/' libDir '/libut.lib" -output ' mexFuncPath];
