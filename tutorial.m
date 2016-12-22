@@ -3,7 +3,9 @@
 %% Introduction
 % This document contains information about the installation and usage of
 % STILT.  For details on the method please see
-% TODO: citation
+% Feigelman, J., Ganscha, S., Hastreiter, S., Schwarzfischer, M., Filipczyk, A., Schroeder, T., et al. (2016). 
+% Analysis of Cell Lineage Trees by Exact Bayesian Inference Identifies Negative Autoregulation of Nanog in Mouse 
+% Embryonic Stem Cells. Cell Systems, 3(5), 480?490.e13. http://doi.org/10.1016/j.cels.2016.11.001
 
 %% Installation
 % The STILT toolbox is a set of Matlab scripts/functions and is 'installed'
@@ -21,6 +23,10 @@
 % library is installed on the Matlab path, the directory /thirdparty/libSBML-5.12.0-matlab can
 % be deleted.
 %
+% Please note that STILT requires the use of a matlab compatible C++
+% compiler. In Windows, only the Microsoft Visual Studio compiler is
+% currently supported. Make sure that this compiler is set as default (use
+% "mex -setup" to configure this).
 
 init
 

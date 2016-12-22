@@ -88,5 +88,8 @@ function [ opt ] = stlOptions( model, data, particlenr )
     % Number of parallel workers (determined automatically if [])
     opt.ParallelWorkers = [];
     
+    % setup for the stochastic simulation code (don't use RREs)
+    opt.USE_RRE = false;
+    
 end
 
